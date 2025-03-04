@@ -1,7 +1,7 @@
 import Input from "@/ui/Input";
 import { BACKEND_URL } from "@/config";
 import { useRef, useState } from "react";
-import axios , {AxiosError} from "axios"
+import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import blob1 from "../assets/blob1SVG.svg"
 

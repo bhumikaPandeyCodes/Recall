@@ -1,15 +1,11 @@
 import AddIcon from "@/icons/addIcon"
 import Button from "@/ui/Button"
 import ShareIcon from "@/icons/shareIcon"
-import Card from "./Card"
 import React, { SetStateAction, useEffect, useState } from "react"
-import ContentModal from "./contentModal"
-import ShareModal from "./shareModal"
 import axios from "axios"
 import { BACKEND_URL } from "@/config"
 import { contentTypes } from "@/pages/dashboard"
 import DisplayContent from "./displayContents"
-import CrossIcon from "@/icons/crossIcon"
 import MenuIcon from "@/icons/hamburgerIcon"
 
 interface mainPanelProps{

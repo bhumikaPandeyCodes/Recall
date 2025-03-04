@@ -1,5 +1,4 @@
 import CrossIcon from "@/icons/crossIcon"
-import Tag from "@/ui/tag"
 import React, { SetStateAction } from "react"
 
 interface TagContainerProps{
@@ -11,7 +10,7 @@ interface TagContainerProps{
 export default function TagContainer({selectedTag ,setSelectedTag}: TagContainerProps){
     function handleRemove(tagId: number){
     
-        setSelectedTag((prevState)=>prevState.filter((tag, id)=>id!=tagId) )
+        setSelectedTag((prevState)=>prevState.filter((_, id)=>id!=tagId) )
     }
     return(
         <div className=" flex flex-wrap gap-2 ">

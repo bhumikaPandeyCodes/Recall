@@ -1,7 +1,5 @@
 import { BACKEND_URL } from "@/config";
-import AddIcon from "@/icons/addIcon";
 import UserIcon from "@/icons/userIcon";
-import Input from "@/ui/Input";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
@@ -19,12 +17,14 @@ export  default function ImageUpload(){
 
     function handleClick(e:React.MouseEvent<HTMLButtonElement>){
         e.preventDefault()
+        setError("")
         console.log("clicked")
         imgRef.current?.click()
         setAddImg(true)
     }
 
     function handlechange(){
+        setError("")
         if(imgRef.current?.files){
             const img = imgRef.current.files[0]
             console.log(imgRef.current.files)
@@ -35,6 +35,7 @@ export  default function ImageUpload(){
     
     async function handleSubmit(e:React.MouseEvent<HTMLButtonElement>){
         e.preventDefault()
+        setError("")
         if(addImg)
         {
             if(formData){
@@ -72,6 +73,7 @@ export  default function ImageUpload(){
 
     function handleSkip(e:React.MouseEvent<HTMLButtonElement>){
         e.preventDefault()
+        setError("")
         if(imgRef.current?.files){
             imgRef.current.value = ""
         }
@@ -108,8 +110,7 @@ export  default function ImageUpload(){
                             Skip
                         </button>
                     </div>
-                    <div>
-                </div>
+                    {error && <p className="text-red-400">{error}</p>}
                     <button className="px-2 py-1 w-full border-[1.6px] border-gray-500 rounded-md" onClick={(e)=>handleSubmit(e)}>Done</button>
                 </form>
             </div>

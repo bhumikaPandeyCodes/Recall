@@ -2,7 +2,6 @@ import Input from "@/ui/Input";
 import CrossIcon from "../icons/crossIcon";
 import AddTag from "@/ui/addTag";
 import Button from "@/ui/Button";
-import Tag from "@/ui/tag";
 import React, { SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
@@ -25,7 +24,7 @@ export default function ContentModal({setAddContent}: contentModalProps){
     const [newContent, setNewContent] = useState<newContentType>({type: "Link", title:"", link:"",tags:[]})
     const [tags, setTags] = useState<string[] |null>(null)
     const [selectedTag, setSelectedTag] = useState<string[]>([])
-    const [authorization, setAuthorization] = useState<string | null>(localStorage.getItem("authorization"))
+    const [authorization, _] = useState<string | null>(localStorage.getItem("authorization"))
     const [error, setError] = useState("")
 
     async function getTags(){

@@ -1,5 +1,4 @@
 
-import Button from "@/ui/Button"
 import blob1 from "../assets/blob1SVG.svg"
 import cornerSVG1 from "../assets/corner1.svg"
 import cornerSVG2 from "../assets/corner2.svg"

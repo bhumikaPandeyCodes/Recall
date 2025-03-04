@@ -1,5 +1,4 @@
 
-import HomeIcon from "@/icons/homeIcon"
 import { contentTypes } from "@/pages/dashboard"
 import React, { ReactElement, SetStateAction } from "react"
 

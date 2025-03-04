@@ -2,15 +2,11 @@ import HomeIcon from "@/icons/homeIcon";
 import SidebarItem from "./SidebarItem";
 import TweetIcon from "@/icons/tweetIcon";
 import VideoIcon from "@/icons/videoIcon";
-import DocumentIcon from "@/icons/documentIcon";
 import LinkIcon from "@/icons/linkIcon";
-import TagIcon from "@/icons/tagsIcon";
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
 import React, { SetStateAction, useEffect, useState } from "react";
 import UserIcon from "@/icons/userIcon";
-import { blob } from "stream/consumers";
-import { url } from "inspector";
 import { contentTypes } from "@/pages/dashboard";
 import CrossIcon from "@/icons/crossIcon";
 
