@@ -401,7 +401,7 @@ app.get("/api/v1/content/:share", (req, res) => __awaiter(void 0, void 0, void 0
         console.log(error);
     }
 }));
-const server = app.listen(3000, () => {
+const server = app.listen(8080, () => {
     console.log("listening");
 });
 const shutdown = () => {

@@ -16,8 +16,11 @@ app.use(cors())
 const storage = multer.memoryStorage()
 const upload = multer({storage})
 
-// SIGNUP ENDPOINT //
+app.get("/",(req,res)=>{
+    res.send("Backend is running!")
+})
 
+// SIGNUP ENDPOINT //
 app.post("/api/v1/signup",SignupInputVerify, async(req,res)=>{
 
 //  1. validating input using zod
@@ -74,19 +77,19 @@ app.post("/api/v1/signin", async (req,res)=>{
             const existUser = await UserModal.findOne(query)
             console.log(existUser)
             if(existUser && existUser.password){
-                console.log("found user now checking password")
+                // console.log("found user now checking password")
                 // 3. check password 
                 const verifiedPass = await bcrypt.compare(password, existUser.password)
     
                 //4. create jwt
                 if(verifiedPass){
-                    console.log("password is correct")
+                    // console.log("password is correct")
                     const token = jwt.sign({id: existUser._id}, JWT_SECRET)
                     res.status(200).json({success: true, token})
                     return;
                 }
                 else{
-                    console.log("password wasnt correct")
+                    // console.log("password wasnt correct")
                     res.status(403).json({success:false, errorType: "jwt", error: "username/email or password is wrong"})
                     return;
                 }
@@ -434,7 +437,7 @@ app.get("/api/v1/content/:share", async(req,res)=>{
 
 
 
-const server = app.listen(3000, ()=>{
+const server = app.listen(PORT, ()=>{
     console.log("listening")
 })
 const shutdown = () => {
