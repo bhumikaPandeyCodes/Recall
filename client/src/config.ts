@@ -1,3 +1,2 @@
-import 'dotenv/config'
 
-export const BACKEND_URL = process.env.BACKEND_URL as string
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL 
