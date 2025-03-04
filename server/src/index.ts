@@ -1,23 +1,28 @@
 //IMPORTING MODULES
 import express from "express"
-import { UserModal,ContentModal, LinkModal } from "./db"
+import multer from "multer"
+import validator from "validator"
+import { UserModal,ContentModal, LinkModal, TagsModal } from "./db"
 import cors from 'cors'
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt, { JwtPayload, verify } from "jsonwebtoken"
 import bcrypt from "bcrypt"
-import { JWT_SECRET, SALT_ROUNDS } from "./config"
-import {SignupInputVerify,SigninInputVerify, verifyUserToken} from "./middleware/Auth"
-import {random} from "./utils"
+import { JWT_SECRET, SALT_ROUNDS, PORT } from "./config"
+import {SignupInputVerify, verifyUserToken} from "./middleware/Auth"
+import {capitalName, random} from "./utils"
 const app = express()
-const PORT = 3000
 app.use(express.json())
 app.use(cors())
+
+const storage = multer.memoryStorage()
+const upload = multer({storage})
+
 // SIGNUP ENDPOINT //
 
 app.post("/api/v1/signup",SignupInputVerify, async(req,res)=>{
 
 //  1. validating input using zod
     try{
-            const username = req.body.username
+            const username = capitalName(req.body.username)
             const email = req.body.email
 
             //2. encrypt password
@@ -55,65 +60,163 @@ app.post("/api/v1/signup",SignupInputVerify, async(req,res)=>{
     console.log("-----------------server error----------------------")
     res.status(500).json({success: false,erroType:"Server Error" ,message: "server error"})
 })
-
 // SIGNIN ENDPOINT //
-app.post("/api/v1/signin",SigninInputVerify, async (req,res)=>{
-    //1. validated usign zod
+app.post("/api/v1/signin", async (req,res)=>{
 
-    try{
-        const email = req.body.email
+        const userIdentity = req.body.userIdentity
         const password = req.body.password
 
+        async function validateUser(query: Record<string,string>){
         // 2. check if the email exist
-        const existUser = await UserModal.findOne({email})
-        if(existUser && existUser.password){
-
-            // 3. check password 
-            const verifiedPass = await bcrypt.compare(password, existUser.password)
-
-            //4. create jwt
-            if(verifiedPass){
-                const token = jwt.sign({id: existUser._id}, JWT_SECRET)
-                res.status(200).json({success: true, token})
-                return;
+        try{
+        console.log("checking email")
+        console.log(query)
+            const existUser = await UserModal.findOne(query)
+            console.log(existUser)
+            if(existUser && existUser.password){
+                console.log("found user now checking password")
+                // 3. check password 
+                const verifiedPass = await bcrypt.compare(password, existUser.password)
+    
+                //4. create jwt
+                if(verifiedPass){
+                    console.log("password is correct")
+                    const token = jwt.sign({id: existUser._id}, JWT_SECRET)
+                    res.status(200).json({success: true, token})
+                    return;
+                }
+                else{
+                    console.log("password wasnt correct")
+                    res.status(403).json({success:false, errorType: "jwt", error: "username/email or password is wrong"})
+                    return;
+                }
             }
             else{
-                res.status(403).json({success:false, errorType: "Incorrect password", message: "Incorrect Password"})
-                return;
+                res.status(403).json({success:false, errorType: "jwt", error: "username/email or password is wrong"})
             }
         }
-        else{
-            res.status(404).json({errorType: "Input Error", message: "Email does not exist"})
-            return;
-        }
-    }
     catch(error){
         console.log("-----------signin error -------------")
         console.log(error)
         res.status(400).json({message: "error"})
         return;
     }
-    console.log("-----------------server error----------------------")
-    res.status(500).json({success: false,erroType:"Server Error" ,message: "server error"})
+}
 
+    if(validator.isEmail(userIdentity)){
+        validateUser({email: userIdentity})
+        console.log("this was email")
+    }
+    else{
+        validateUser({username: userIdentity})
+        console.log("this is username")
+    }
+    
 })
+
+// ADD-IMAGE ENDPOINT
+app.put("/api/v1/upload-image",upload.single("profile") ,verifyUserToken, async(req,res)=>{
+    const userId = req.body.userId
+    try {
+        
+        if(req.file){
+
+            const response = await UserModal.updateOne({
+                _id: userId
+            }, {
+                image: req.file.buffer
+            })
+            if(response){
+                console.log(response)
+                res.status(200).json(response)
+            }
+            else{
+                console.log("couldnt upload file")
+                res.status(300)
+            }
+        }
+    } 
+    catch (error) {
+        console.log("error while uploading image")
+        console.log(error)
+        res.status(304).json(error)
+    }
+})
+
+// GET-USER-INFO (for sidebar)
+app.get("/api/v1/user-info",verifyUserToken,async(req,res)=>{
+    const userId = req.body.userId
+    try {
+        
+        const response = await UserModal.findOne({_id: userId}).select("username email image")
+        if(response){
+            // res.set("Content-Type","image/png")
+            res.status(200).json(response)
+            // console.log(response)
+        }
+        else{
+            res.status(401).json({message:"please login again"})
+            console.log("couldn't get response")
+        }
+
+    } catch (error) {
+        res.status(404).json({message:"please login again"})
+        console.log(error)
+        
+    }
+})
+
+// GET TAGS //
+app.get("/api/v1/get-tags",async(req,res)=>{
+    
+    try{
+
+        const tags = await TagsModal.find()
+        if(tags){
+            // console.log(tags)
+            const tagsNames = tags.map((tag)=>tag.name)
+            res.status(200).json({tags:tagsNames})
+        }
+        else{
+            res.status(204)
+            console.log(tags)
+        }
+
+    }
+    catch(error){
+        res.status(404)
+        console.log(error)
+    }
+})
+
 
 // ADD-CONTENT ENDPOINT //
 app.post("/api/v1/add-content",verifyUserToken ,async (req,res)=>{
     // const userId = req.body.userId
-    const {userId, type, link, title, tags} = req.body
+    const {type, link, title, tags} = req.body.newContent
+    const userId = req.body.userId
     // console.log(userId)
     // console.log(type)
     // console.log(link)
     // console.log(title)
-    // console.log(tags)
+    // console.log(tags) 
+
     try{
+    const existingTags = await TagsModal.find({name: {$in: tags}})
+    const existingTagsName = existingTags.map((tag)=> tag.name)
+    const existingTagIds = existingTags.map((tag)=> tag._id)
+    const newTags = tags.filter((tag:string)=>!existingTagsName.includes(tag))
+    const InsertNewTags = await TagsModal.insertMany(newTags.map((tag:string)=>({name:tag})))
+    const newTagsId = InsertNewTags.map((tag)=>tag._id)
+    const tagIds = [...existingTagIds, ...newTagsId]
+    // console.log(tagId)
+
         const newContent = await ContentModal.create({ 
             type,
             link,
             title,
-            tags,
             userId,
+            tags: tagIds,
         })
         if(newContent){
             console.log("content created")
@@ -132,7 +235,7 @@ app.post("/api/v1/add-content",verifyUserToken ,async (req,res)=>{
 
 })
 
-// GET-CONTENT ENDPOINT //
+// GET-PARTICULAR CONTENT ENDPOINT //
 app.get("/api/v1/view-content", verifyUserToken,async(req,res)=>{
     const {userId, contentId} = req.body
     try{
@@ -157,17 +260,39 @@ app.get("/api/v1/view-content", verifyUserToken,async(req,res)=>{
     }
 })
 
-// GET ALL CONENT OF USER //
+// GET ALL CONTENT OF USER //
 app.get("/api/v1/content",verifyUserToken, async (req, res)=>{
-    
     const userId = req.body.userId
+    const type = req.query.type
     try{
-       const foundContents = await ContentModal.find({userId})
-       if(foundContents){
-        res.status(200).json({success:true, foundContents})
-       }
-       else{
-        res.status(204).json({success: false, message:"no contents found"})
+        let foundContents
+    if(type==="all"){
+
+        foundContents  = await ContentModal.find({userId}).populate({path:'userId', select: 'username'}).populate('tags','name')
+    }
+    else{
+            foundContents = await ContentModal.find({userId, type}).populate({path:'userId', select: 'username'}).populate('tags','name')
+
+    }
+        if(foundContents.length==0){
+            console.log(foundContents)
+            // console.log("content not found")
+            const user = await UserModal.findOne({_id:userId})
+            if(user){
+                let username = user.username
+                res.status(200).json({foundContents,username})
+                // console.log("user exist but content doesnt")
+            }
+            else{
+                // console.log("user doesnt exist")
+                res.status(404)
+            }
+        }
+        else{
+            // console.log("foundcontent exist")
+            // console.log(foundContents[0])
+           let username = (foundContents[0]?.userId as {_id: string, username: string}).username
+        res.status(200).json({foundContents, username })
        }
     }
     catch(error){
@@ -182,13 +307,15 @@ app.delete("/api/v1/content",verifyUserToken, async (req,res)=>{
     const {userId, contentId} = req.body
     try{
         const deleted = await ContentModal.deleteOne({_id: contentId})
-        res.status(302).json({success:true})
-        return;
+        if(deleted)
+        res.status(200).json({success:true})
+        else
+        res.status(500)
         //expected ----------> { acknowledged: true, deletedCount: 1 }
     }
     catch(error){
         // console.log("-----error--------")
-        res.status(500).json({success:false, message: "couldn't delete"})
+        res.status(500).json({success:false})
         console.log(error)
     }
 })
@@ -199,29 +326,43 @@ app.post("/api/v1/content/share",verifyUserToken ,async(req, res)=>{
 
     if(share){
         try{
-            const linkExist = await LinkModal.findOne({userId})
-            if(linkExist)
-            {
-                res.status(200).json(linkExist.hash)
-                return
+
+            const contentExist = await ContentModal.find({userId})
+            if(contentExist.length==0){
+                // console.log("content does not exist ")
+                res.status(200).json({success:false})
             }
-            else{
-                const hash = random(10)
-                const Link = await LinkModal.create({
-                    hash,
-                    userId
-                })
-                if(Link){
-                    //created link
-                    const shareableLink = `/content/share/${hash}`
-                    res.status(201).json({success:true, link: shareableLink })
-                }
-                else{
-                    //unexpected error occured while creating link
-                    res.status(500).json({success:false})
+            else{   
+                // console.log("content exist ")
+                const linkExist = await LinkModal.findOne({userId})
+                if(linkExist)
+                    {
+                        console.log("link already exist ")
+                        const shareableLink = `/${linkExist.hash}`
+                        res.status(200).json({success:true, link: shareableLink})
+                        return
+                    }
+                    else{
+                        // console.log("link created ")
+                        const hash = random(10)
+                        const Link = await LinkModal.create({
+                            hash,
+                            userId
+                        })
+                        if(Link){
+                            // console.log("link created succesfuly")
+                            //created link
+                            const shareableLink = `/${hash}`
+                            res.status(200).json({success:true, link: shareableLink })
+                        }
+                        else{
+                            // console.log("link not created")
+                            //unexpected error occured while creating link
+                            res.status(500).json({success:false})
+                        }
+                    }
                 }
             }
-        }
         catch(error){
             console.log(error)
         }
@@ -246,25 +387,33 @@ app.post("/api/v1/content/share",verifyUserToken ,async(req, res)=>{
 
 // FETCH CONTENT BY LINK //
 app.get("/api/v1/content/:share", async(req,res)=>{
-    const share = req.params.share
+    const share = req.params.share.replace(":","")
+    // console.log(share)
     try{
         const Link = await LinkModal.findOne({hash:share})
         if(Link){
 
             const userId = Link.userId
             if(userId){
-                const Content = await ContentModal.find({userId})
-                if(Content)
+                const content = await ContentModal.find({userId}).populate('userId','username').populate('tags','name')
+                if(content)
                 {
-                    res.status(200).json({Content})
-                    console.log(Content)
+                    const username = (content[0].userId as {_id:string, username: string}).username
+                    res.status(200).json({content, username})
+                    // console.log(content)
                     return
                 }
                 else{
+                    const user = await UserModal.findOne({_id: userId})
                     //no content 204
-                    res.status(204).json({message: "No content found"})
-                    console.log("couldnt get content")
-                    return
+                    if(user){
+                        res.status(200).json({content,username: user.username})
+                        // console.log("user exist but content doesnt")
+                    }
+                    else{
+                        // console.log("user doesnt exist")
+                        res.status(404)
+                    }
                 }
             }
             else{
@@ -285,8 +434,18 @@ app.get("/api/v1/content/:share", async(req,res)=>{
 
 
 
-
-
-app.listen(PORT, ()=>{
+const server = app.listen(3000, ()=>{
     console.log("listening")
 })
+const shutdown = () => {
+    console.log('Shutting down server...');
+    server.close(() => {
+      console.log('Server closed.');
+      process.exit(0);
+    });
+  };
+  
+  // Handle termination signals
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+  process.on('exit', shutdown);

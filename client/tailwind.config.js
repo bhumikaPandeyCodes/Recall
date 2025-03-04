@@ -9,7 +9,8 @@ export default {
 		},
       borderWidth:{
         1:"1px"
-      }
+      },
+      
   	}
   },
   plugins: [require("tailwindcss-animate")],

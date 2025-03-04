@@ -11,17 +11,18 @@ const UserSchema = new mongoose_1.default.Schema({
     username: { type: String, unique: true },
     email: { type: String, unique: true },
     password: { type: String },
+    image: { type: Buffer, default: null },
 });
 const TagsSchema = new mongoose_1.default.Schema({
-    name: { type: String, unique: true }
+    name: { type: String, unique: true, require: true }
 });
 const ContentSchema = new mongoose_1.default.Schema({
-    type: { type: String },
     link: String,
     title: String,
+    type: { type: String }, // <--
     tags: [{ type: mongoose_1.default.Types.ObjectId, ref: 'tags' }],
     userId: { type: mongoose_1.default.Types.ObjectId, ref: 'users' }
-});
+}, { timestamps: true });
 const LinkSchema = new mongoose_1.default.Schema({
     hash: { type: String },
     userId: { type: mongoose_1.default.Types.ObjectId, ref: 'users', unique: true }

@@ -8,20 +8,23 @@ const UserSchema = new mongoose.Schema({
     username: {type: String, unique: true},
     email: {type: String, unique: true} ,
     password: {type: String},
+    image: {type: Buffer, default: null} ,
 })
 
+
 const TagsSchema = new mongoose.Schema({
-    name: {type: String, unique: true}
+    name: {type: String, unique: true,require:true}
 })
 
 const ContentSchema = new mongoose.Schema({
-    type: {type: String},
     link: String,
     title:String,
+    type: {type: String}, // <--
     tags: [{type: mongoose.Types.ObjectId, ref:'tags'}],
     userId: {type: mongoose.Types.ObjectId, ref:'users'}
 
-})
+},{timestamps: true}
+)
 
 const LinkSchema = new mongoose.Schema({
     hash: {type: String},

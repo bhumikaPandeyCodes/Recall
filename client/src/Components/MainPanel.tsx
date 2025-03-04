@@ -2,19 +2,47 @@ import AddIcon from "@/icons/addIcon"
 import Button from "@/ui/Button"
 import ShareIcon from "@/icons/shareIcon"
 import Card from "./Card"
-import { SetStateAction, useState } from "react"
+import React, { SetStateAction, useEffect, useState } from "react"
 import ContentModal from "./contentModal"
 import ShareModal from "./shareModal"
+import axios from "axios"
+import { BACKEND_URL } from "@/config"
+import { contentTypes } from "@/pages/dashboard"
+import DisplayContent from "./displayContents"
+import CrossIcon from "@/icons/crossIcon"
+import MenuIcon from "@/icons/hamburgerIcon"
 
 interface mainPanelProps{
   addContent: boolean,
   setAddContent: React.Dispatch<SetStateAction<boolean>>
   share: boolean,
   setShare: React.Dispatch<SetStateAction<boolean>>
+  viewContent: contentTypes,
+  viewSidebar: boolean,
+  setViewSidebar: React.Dispatch<SetStateAction<boolean>>
 }
 
-const MainPanel = ({addContent, setAddContent, share, setShare}: mainPanelProps) => {
+export type TagsType = {
+  name: string,
+  _id: string
+}
 
+export type ContentsType = {
+  link: string,
+  tags: TagsType[],
+  title: string
+  type: string,
+  _id: string,
+  createdAt: string
+}
+
+
+const MainPanel = ({addContent, setAddContent, share, setShare, viewContent, viewSidebar, setViewSidebar}: mainPanelProps) => {
+
+  const [contents, setContents] = useState<ContentsType[] | null>(null)
+  const [message, setMessage] = useState("")
+  const [username, setUsername] = useState("")
+  const authorization = localStorage.getItem("authorization")
 
   function handleAddContent(){
     setAddContent(true)
@@ -27,30 +55,70 @@ const MainPanel = ({addContent, setAddContent, share, setShare}: mainPanelProps)
   }
   
 
+  async function showContent(){
+    try{
+      console.log(viewContent)
+        const response = await axios.get(BACKEND_URL+`/api/v1/content?type=${viewContent}`,{headers: {authorization}})
+        // console.log(response)
+        if(response.data){
+
+          if(response.data.foundContents.length>0){
+
+            setContents(response.data.foundContents)
+            setUsername(response.data.username)
+          }
+          else{
+            setContents(null)
+                setUsername(response.data.username)
+                setMessage("No contents found")
+              }
+           }
+
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+async function deleteContent(id: string){
+  console.log(id)
+  try{
+    const response = await axios.delete(BACKEND_URL+"/api/v1/content",{
+      headers:{authorization},
+      data: {contentId: id}
+    })
+    if(response.data.success==true)
+      location.reload()
+  }
+  catch(error){
+    console.log(error)
+  }
+
+}
+
+  useEffect(()=>{
+  showContent()
+  console.log(contents)
+  },[viewContent])
 
 
   return (
-    <div className="h-full w-[calc(100vw-18rem)] p-3 relative ">
-     { addContent && <div className="absolute left-[300px] top-[100px] bg-white justify-center items-center rounded-md">
-                    <ContentModal setAddContent={setAddContent} />
-                </div>}
-      {share && <div className="absolute left-[300px] top-[100px]">
-          <ShareModal setShare={setShare}/>
-        </div>}
-
-        <div>
-        <div className="flex justify-between">
-            <span className="font-semibold text-xl">Hello Sarah!</span>
-            <div className="flex gap-2">
-                <Button onClick={handleAddContent} type="primary" text="Add content" startIcon={<AddIcon/>} />
-                <Button onClick={handleShareContent} type="primary" text="Share" startIcon={<ShareIcon/>} />
+    <div className={`h-full w-screen sm:w-[calc(100vw-20rem)] py-4 px-3 ${(addContent || share)&&"overflow-y-hidden"}`}>
+     
+        <div className={`${!viewSidebar?"block":"hidden" } sm:block`}>
+        <div className="flex flex-col gap-4 md:gap-0 md:flex-row justify-between">
+          {
+            !viewSidebar && <div className="sm:hidden block" onClick={()=>setViewSidebar(true)}>
+            <MenuIcon />
+            </div>
+          }
+            <span className="font-semibold text-lg md:text-xl text-center md:text-left sm:w-full">{username}'s Board</span>
+            <div className="flex gap-2 self-end justify-around w-full md:justify-end">
+                <Button onClick={handleAddContent} variant="primary" text="Add content" startIcon={<AddIcon/>} />
+                <Button onClick={handleShareContent} variant="secondary" text="Share" startIcon={<ShareIcon/>} />
             </div>
         </div>
-
-        <div className="flex gap-4 mt-20">
-            <Card type="tweet" title="Interview tips" tags={["interview", "job"]} link="https://x.com/itrytoohard/status/1892099556113829903" />
-            <Card type="youtube" title="Web development" tags={["productivity", "selfcare"]} link="https://www.youtube.com/watch?v=nlx8ug7o5gI" />
-            <Card type="youtube" title="Web development" tags={["productivity", "selfcare"]} link="https://www.youtube.com/watch?v=cydFlJQNAjY" />
+        <div className="mt-10 sm:mt-20">
+          <DisplayContent authorize={true} contents={contents} message={message} deleteContent={deleteContent}/>
         </div>
        </div>
     </div>

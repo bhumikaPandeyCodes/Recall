@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SignupInputVerify = SignupInputVerify;
-exports.SigninInputVerify = SigninInputVerify;
 exports.verifyUserToken = verifyUserToken;
 const express_1 = __importDefault(require("express"));
 const zod_1 = __importDefault(require("zod"));
@@ -26,11 +25,11 @@ function SignupInputVerify(req, res, next) {
             const requiredBody = zod_1.default.object({
                 username: zod_1.default.string()
                     .min(5, { message: "username is too short" })
-                    .max(15, "username cannot have more than 10 characters"),
+                    .max(15, "username cannot have more than 15 characters"),
                 email: zod_1.default.string().email(),
                 password: zod_1.default.string()
-                    .min(8, { message: "password should have atleast 8 characters" })
-                    .max(20, { message: "password cannot have more than 10 characters" })
+                    .min(6, { message: "password should have atleast 6 characters" })
+                    .max(20, { message: "password cannot have more than 20 characters" })
                     .regex(/[A-Z]/, { message: "password must contain atleast one capital character" })
                     .regex(/[a-z]/, { message: "password must contain atleast one lowercase character" })
                     .regex(/[0-9]/, { message: "password must contain atleast one number" })
@@ -43,6 +42,7 @@ function SignupInputVerify(req, res, next) {
             }
             else {
                 res.status(400).json({ message: "invalid input | bad request", error: validateBody.error.issues[0].message });
+                console.log(validateBody.error.issues[0].message);
             }
         }
         catch (error) {
@@ -50,32 +50,10 @@ function SignupInputVerify(req, res, next) {
         }
     });
 }
-function SigninInputVerify(req, res, next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const requiredBody = zod_1.default.object({
-                email: zod_1.default.string().email(),
-                password: zod_1.default.string()
-                    .min(8, { message: "password should have atleast 8 characters" })
-                    .max(20, { message: "password cannot have more than 10 characters" })
-                    .regex(/[A-Z]/, { message: "password must contain atleast one capital character" })
-                    .regex(/[a-z]/, { message: "password must contain atleast one lowercase character" })
-                    .regex(/[0-9]/, { message: "password must contain atleast one number" })
-                    .regex(/[@$!%*?&#]/, { message: "password must contain atleast one special character" })
-            });
-            const validateBody = requiredBody.safeParse(req.body);
-            if (validateBody.success) {
-                next();
-            }
-            else {
-                res.status(400).json({ message: "invalid input | bad request" });
-            }
-        }
-        catch (error) {
-            res.status(503).json({ message: "service unavailabe" });
-        }
-    });
-}
+// export function isEmail(userIdentity: string){
+//     if(validator.isEmail(userIdentity))
+//     return true
+// }
 function verifyUserToken(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

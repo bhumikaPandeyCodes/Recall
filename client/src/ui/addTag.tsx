@@ -1,43 +1,46 @@
+import { stringify } from "querystring"
 import { SetStateAction, useEffect, useState } from "react"
 
 interface addTagProps {
-    tags: string[], 
+    tags: string[] | null, 
     selectedTags: string[],
-    setSelectedTags: React.Dispatch<SetStateAction<string[]>>
+    setSelectedTags: React.Dispatch<SetStateAction<string[]>>,
+    setError: React.Dispatch<SetStateAction<string>>
 
 }
 
-export default function AddTag({tags,selectedTags , setSelectedTags}:addTagProps){
+export default function AddTag({tags,selectedTags , setSelectedTags, setError}:addTagProps){
 
     const [showTags, setShowTags] = useState(false)
-    const [selectedTag, setSelectedTag] = useState<string[]>([])
+    // const [selectedTag, setSelectedTag] = useState<string[]>([])
     const [newTag, setNewTag] = useState("")
 
     function addNew(){
-
-        if(!selectedTag.includes(newTag)){
-            setSelectedTag((prevTag)=>[...prevTag, newTag])
+        
+        //check if new input tag already exists in selectedtags
+        if(selectedTags.length==4){
+            setError("cannot select more than 3 tags")
         }
         else{
-            console.log("already selected")
 
+            if(!selectedTags.includes(newTag)){
+                setSelectedTags((prevTag)=>[...prevTag, newTag])
+            }
+            else{
+                console.log("already selected")
+                
+            }
         }
+        setNewTag("")
         //when new tag is added then add back in db
-        if(!tags.includes(newTag)){
-            tags.push(newTag)
-        }
-        console.log(tags)
+        // if(!tags.includes(newTag)){
+        //     tags.push(newTag)
+        // }
 
 
-        console.log(selectedTag)
-    }
+    }  
 
-    function handleChange(e:React.ChangeEvent<HTMLInputElement>) {
-        // if(e.target.value)
-        //     setNewTag(e.target.value)
-        // setSelectedTag((prevTag)=>[...prevTag, newTag])
-    }   
-
+    //Click anywhere dropdown will close
     function detectClick (e:MouseEvent) {
             console.log("click detected")
             const target = e.target as HTMLInputElement
@@ -46,7 +49,9 @@ export default function AddTag({tags,selectedTags , setSelectedTags}:addTagProps
         }
 
     useEffect(()=>{
-       {showTags && document.body.addEventListener('click',detectClick )}
+        if(showTags)
+        document.body.addEventListener('click',detectClick )
+        return ()=>{document.body.removeEventListener('click', detectClick)}
     },[showTags])
 
     return(
@@ -60,7 +65,7 @@ export default function AddTag({tags,selectedTags , setSelectedTags}:addTagProps
                     className="border-[1.4px] border-gray-500 pl-2 w-[calc(100%-12px)] outline-none rounded-sm"
                     onClick={()=>setShowTags(true)}
                     /> 
-               {showTags && <Tags tags={tags} setNewTag={setNewTag} />}
+               {showTags && <DropDownTags tags={tags} newTag={newTag} setNewTag={setNewTag} />}
             </div>
                <div className="cursor-pointer rounded-full border-[1.4px] bg-gray-50 border-black w-7 h-7  text-lg font-semibold text-center"
                onClick={addNew}>+
@@ -69,25 +74,71 @@ export default function AddTag({tags,selectedTags , setSelectedTags}:addTagProps
     )
 }
 
-interface TagProps{
-    tags: string[],
+interface DropDownTagsProps{
+    tags: string[] | null,
+    newTag: string,
     setNewTag: (tag: string)=>void
 }
 
-function Tags({tags, setNewTag}:TagProps) {
+function DropDownTags({tags,newTag ,setNewTag}:DropDownTagsProps) {
+
+    // let x: {tagName: string, tagPosition: number}[] = [{tagName: "prodcutivity",tagPosition:2},{tagName: "study",tagPosition:7}]
+    let [filterTags, setFilterTags] = useState<{tagName:string, tagPosition: number}[] >([])
+    function searchTag(){
+        // console.log("seach tag call")
+        if(tags){
+
+            const searchingTags:{tagName:string, tagPosition: number}[]   = tags?.map((tag)=>{
+                let pos = tag.search(newTag)
+                if(pos>-1){
+                    return {tagName: tag, tagPosition: pos}
+                }
+                return null
+            })
+            .filter((tag): tag is {tagName: string, tagPosition: number}=>tag!=null )
+            .sort((a,b)=>{ return a!.tagPosition-b!.tagPosition})
+            // console.log(searchingTags)
+            // if(searchingTags)
+                setFilterTags(searchingTags)
+        }
+        else return ;
+    }
+
+    useEffect(()=>{
+        searchTag()
+        // console.log(x)
+        // console.log(newTag)
+    },[newTag])
+
         return (
             <div className="flex flex-col shadow-md rounded-md absolute z-10 bg-white w-[calc(100%-8px)]">
                 {
-                    tags.map((tag, key)=>
-                        <span 
+                   filterTags && filterTags.map((tag, key)=>(
+                        <div 
                            key={key}
                            className="px-2 py-[2px] hover:bg-slate-100 cursor-pointer"
-                           onClick={()=>setNewTag(tag)}>
-                             {tag}
-                        </span>
-                    )  
+                           onClick={()=>{setNewTag(tag.tagName)}}>
+                             <DisplayTag tag={tag} newTag={newTag} />
+                        </div>)
+                    ) 
                 }
                 
             </div>
         )
+}
+
+function DisplayTag({tag, newTag}: {tag: {tagName:string, tagPosition: number}, newTag: string}){
+    const {tagName, tagPosition} = tag
+    return (
+        <span>{
+            tagName.split("").map((char, i)=>{
+                return(
+                    i>=tagPosition && i<tagPosition+newTag.length ?
+                    <span key={i} className="font-bold">{char}</span>
+                    :
+                    <span key={i} className="font-normal">{char}</span>
+                )
+            })}
+        </span>
+    )
 }
