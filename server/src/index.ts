@@ -89,7 +89,7 @@ app.post("/api/v1/signin", async (req,res)=>{
                     return;
                 }
                 else{
-                    // console.log("password wasnt correct")
+                    console.log("password wasnt correct")
                     res.status(403).json({success:false, errorType: "jwt", error: "username/email or password is wrong"})
                     return;
                 }
