@@ -270,6 +270,7 @@ app.get("/api/v1/content", Auth_1.verifyUserToken, (req, res) => __awaiter(void 
             }
             else {
                 // console.log("user doesnt exist")
+                console.log();
                 res.status(404);
             }
         }

@@ -275,6 +275,7 @@ app.get("/api/v1/content",verifyUserToken, async (req, res)=>{
     }
     else{
             foundContents = await ContentModal.find({userId, type}).populate({path:'userId', select: 'username'}).populate('tags','name')
+        console.log(foundContents)
 
     }
         if(foundContents.length==0){
@@ -288,6 +289,8 @@ app.get("/api/v1/content",verifyUserToken, async (req, res)=>{
             }
             else{
                 // console.log("user doesnt exist")
+                console.log(user)
+                console.log()
                 res.status(404)
             }
         }

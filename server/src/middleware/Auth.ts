@@ -55,18 +55,19 @@ export async function verifyUserToken(req:Request, res:Response, next: NextFunct
         if(token)
             {
             const decodedData = jwt.verify(token as string, JWT_SECRET)
-            if(token){
+            if(decodedData){
                 req.body.userId = (decodedData as JwtPayload).id
                 next()
             }
             else{
-                res.json({message: "Invalid token"})
+                console.log("invalid token", decodedData)
+                res.send({message: "Invalid token"})
                 return;
             }
         }
         else{
             // console.log("-------------token does not exist--------")
-            res.status(400).json({message: "token does not exist | not logged in"})
+            res.status(400).send({message: "token does not exist | not logged in"})
             return;
         }
     }
