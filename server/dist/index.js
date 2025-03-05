@@ -94,7 +94,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
                         return;
                     }
                     else {
-                        // console.log("password wasnt correct")
+                        console.log("password wasnt correct");
                         res.status(403).json({ success: false, errorType: "jwt", error: "username/email or password is wrong" });
                         return;
                     }
@@ -258,6 +258,7 @@ app.get("/api/v1/content", Auth_1.verifyUserToken, (req, res) => __awaiter(void 
         }
         else {
             foundContents = yield db_1.ContentModal.find({ userId, type }).populate({ path: 'userId', select: 'username' }).populate('tags', 'name');
+            console.log(foundContents);
         }
         if (foundContents.length == 0) {
             console.log(foundContents);
@@ -270,6 +271,7 @@ app.get("/api/v1/content", Auth_1.verifyUserToken, (req, res) => __awaiter(void 
             }
             else {
                 // console.log("user doesnt exist")
+                console.log(user);
                 console.log();
                 res.status(404);
             }

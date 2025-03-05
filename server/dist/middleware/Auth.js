@@ -60,18 +60,19 @@ function verifyUserToken(req, res, next) {
             const token = req.headers.authorization;
             if (token) {
                 const decodedData = jsonwebtoken_1.default.verify(token, config_1.JWT_SECRET);
-                if (token) {
+                if (decodedData) {
                     req.body.userId = decodedData.id;
                     next();
                 }
                 else {
-                    res.json({ message: "Invalid token" });
+                    console.log("invalid token", decodedData);
+                    res.send({ message: "Invalid token" });
                     return;
                 }
             }
             else {
                 // console.log("-------------token does not exist--------")
-                res.status(400).json({ message: "token does not exist | not logged in" });
+                res.status(400).send({ message: "token does not exist | not logged in" });
                 return;
             }
         }
