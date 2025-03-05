@@ -28,7 +28,7 @@ export default function Dashboard(){
         setError("No content here to be shared!")
       }
       else if(serverResponse.success==true){
-        setShareLink(FRONTEND_URL+"/share"+response.data.link)
+        setShareLink(FRONTEND_URL+"share"+response.data.link)
       }
     }
     catch(error){
