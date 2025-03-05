@@ -53,7 +53,7 @@ const MainPanel = ({addContent, setAddContent, share, setShare, viewContent, vie
 
   async function showContent(){
     try{
-      console.log(viewContent)
+      // console.log(viewContent)
         const response = await axios.get(BACKEND_URL+`/api/v1/content?type=${viewContent}`,{headers: {authorization}})
         // console.log(response)
         if(response.data){
@@ -72,11 +72,11 @@ const MainPanel = ({addContent, setAddContent, share, setShare, viewContent, vie
 
     }
     catch(error){
-      console.log(error)
+      // console.log(error)
     }
   }
 async function deleteContent(id: string){
-  console.log(id)
+  // console.log(id)
   try{
     const response = await axios.delete(BACKEND_URL+"/api/v1/content",{
       headers:{authorization},
@@ -93,7 +93,7 @@ async function deleteContent(id: string){
 
   useEffect(()=>{
   showContent()
-  console.log(contents)
+  // console.log(contents)
   },[viewContent])
 
 

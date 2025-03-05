@@ -21,13 +21,12 @@ export  default function Signin(){
                 if(userIdentityRef.current.value && passwordRef.current.value){
                     const [userIdentity, password] = [userIdentityRef.current.value, passwordRef.current.value]
 
-                    
                     const response = await axios.post(BACKEND_URL+"/api/v1/signin",{
                         userIdentity,password
                     })
                     if(response.status===200){
                         setError("")
-                        console.log(response.data)
+                        // console.log(response.data)
                         if(response.data.token){
                             localStorage.setItem("authorization",response.data.token)
                         }

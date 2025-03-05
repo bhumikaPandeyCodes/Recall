@@ -83,7 +83,7 @@ app.post("/api/v1/signin", async (req,res)=>{
     
                 //4. create jwt
                 if(verifiedPass){
-                    // console.log("password is correct")
+                    console.log("password is correct")
                     const token = jwt.sign({id: existUser._id}, JWT_SECRET)
                     res.status(200).json({success: true, token})
                     return;

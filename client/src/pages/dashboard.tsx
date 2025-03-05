@@ -2,7 +2,7 @@ import ContentModal from "@/Components/contentModal";
 import MainPanel from "@/Components/MainPanel";
 import ShareModal from "@/Components/shareModal";
 import Sidebar from "@/Components/Sidebar";
-import { BACKEND_URL } from "@/config";
+import { BACKEND_URL, FRONTEND_URL } from "@/config";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -28,11 +28,11 @@ export default function Dashboard(){
         setError("No content here to be shared!")
       }
       else if(serverResponse.success==true){
-        setShareLink("http://localhost:5173/share"+response.data.link)
+        setShareLink(FRONTEND_URL+"/share"+response.data.link)
       }
     }
     catch(error){
-      console.log(error)
+      // console.log(error)
     }
   }
 
@@ -42,7 +42,7 @@ export default function Dashboard(){
       // console.log("share content enabled")
       // console.log(shareLink)
     }
-    console.log(viewContent)
+    // console.log(viewContent)
     // console.log("share button is clicked ")
   },[share])
 

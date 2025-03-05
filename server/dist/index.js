@@ -28,6 +28,9 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({ storage });
+app.get("/", (req, res) => {
+    res.send("Backend is running!");
+});
 // SIGNUP ENDPOINT //
 app.post("/api/v1/signup", Auth_1.SignupInputVerify, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //  1. validating input using zod
@@ -80,7 +83,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
                 const existUser = yield db_1.UserModal.findOne(query);
                 console.log(existUser);
                 if (existUser && existUser.password) {
-                    console.log("found user now checking password");
+                    // console.log("found user now checking password")
                     // 3. check password 
                     const verifiedPass = yield bcrypt_1.default.compare(password, existUser.password);
                     //4. create jwt
@@ -91,7 +94,7 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
                         return;
                     }
                     else {
-                        console.log("password wasnt correct");
+                        // console.log("password wasnt correct")
                         res.status(403).json({ success: false, errorType: "jwt", error: "username/email or password is wrong" });
                         return;
                     }
@@ -401,7 +404,7 @@ app.get("/api/v1/content/:share", (req, res) => __awaiter(void 0, void 0, void 0
         console.log(error);
     }
 }));
-const server = app.listen(8080, () => {
+const server = app.listen(config_1.PORT, () => {
     console.log("listening");
 });
 const shutdown = () => {

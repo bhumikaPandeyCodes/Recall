@@ -1,6 +1,6 @@
 import Input from "@/ui/Input";
 import { BACKEND_URL } from "@/config";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios  from "axios"
 import { useNavigate } from "react-router-dom";
 import blob1 from "../assets/blob1SVG.svg"
@@ -57,7 +57,9 @@ export  default function Signup(){
 
         }
     }
-
+useEffect(()=>{
+ console.log(BACKEND_URL)
+},[])
 
     return(
         <div className="h-screen w-screen flex justify-center items-center overflow-hidden absolute">
