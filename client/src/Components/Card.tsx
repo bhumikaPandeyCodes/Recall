@@ -4,6 +4,13 @@ import Tag from "@/ui/tag";
 import { TagsType } from "./MainPanel";
 import LinkIcon from "@/icons/linkIcon";
 import DeleteIcon from "@/icons/deleteIcon";
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    twttr: any;
+  }
+}
 
 interface CardProps {
   id: string,
@@ -21,7 +28,18 @@ export default function Card({id, type, title, tags, link, createdAt,authorize ,
   function dateConvert(date: string){
     let d = new Date(date)
     return d.toLocaleDateString()
-  }  
+  } 
+  useEffect(()=>{
+    if (window.twttr) {
+      window.twttr.widgets.load();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://platform.twitter.com/widgets.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  },[])
+
 
   return (
     <div id={id} className="w-72  border-[1.2px] border-gray-500 transition-all duration-75 ease-in-out hover:border-[1.4px] bg-inherit rounded-md px-4 pt-2">
