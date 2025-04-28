@@ -73,10 +73,10 @@ export default function AddTag({tags,selectedTags , setSelectedTags, setError}:a
                     /> 
                {showTags && <DropDownTags tags={tags} newTag={newTag} setNewTag={setNewTag} />}
             </div>
-               <button className="cursor-pointer rounded-full border-[1.4px] bg-gray-50 border-black p-1  text-lg font-semibold text-center"
+               <div className="cursor-pointer rounded-full border-[1.4px] bg-gray-50 border-black p-1  text-lg font-semibold text-center"
                onClick={addNew}>
                     <AddIcon />
-               </button>
+               </div>
         </div>
     )
 }
