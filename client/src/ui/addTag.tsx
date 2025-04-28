@@ -1,3 +1,4 @@
+import AddIcon from "@/icons/addIcon"
 import { SetStateAction, useEffect, useState } from "react"
 
 interface addTagProps {
@@ -17,20 +18,26 @@ export default function AddTag({tags,selectedTags , setSelectedTags, setError}:a
     function addNew(){
         
         //check if new input tag already exists in selectedtags
-        if(selectedTags.length==4){
-            setError("cannot select more than 3 tags")
-        }
-        else{
+        if(newTag){
 
-            if(!selectedTags.includes(newTag)){
-                setSelectedTags((prevTag)=>[...prevTag, newTag])
+            if(selectedTags.length==4){
+                setError("cannot select more than 3 tags")
             }
             else{
-                console.log("already selected")
                 
+                if(!selectedTags.includes(newTag)){
+                    setSelectedTags((prevTag)=>[...prevTag, newTag])
+                }
+                else{
+                    console.log("already selected")
+                    
+                }
             }
+            setNewTag("")
         }
-        setNewTag("")
+        else{
+            setError("Cannot select empty tag")
+        }
         //when new tag is added then add back in db
         // if(!tags.includes(newTag)){
         //     tags.push(newTag)
@@ -66,9 +73,10 @@ export default function AddTag({tags,selectedTags , setSelectedTags, setError}:a
                     /> 
                {showTags && <DropDownTags tags={tags} newTag={newTag} setNewTag={setNewTag} />}
             </div>
-               <div className="cursor-pointer rounded-full border-[1.4px] bg-gray-50 border-black w-7 h-7  text-lg font-semibold text-center"
-               onClick={addNew}>+
-               </div>
+               <button className="cursor-pointer rounded-full border-[1.4px] bg-gray-50 border-black p-1  text-lg font-semibold text-center"
+               onClick={addNew}>
+                    <AddIcon />
+               </button>
         </div>
     )
 }

@@ -82,7 +82,7 @@ useEffect(()=>{
                 <Input reference={userNameRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
                 <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
                 <div className="mt-3 ">
-                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md ${isLoading&&"animate-pulse"}`} onClick={handleSignup}>Create Account</button>
+                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 bg-black text-white rounded-md ${isLoading&&"animate-pulse"} duration-1000`} onClick={handleSignup}>Create Account</button>
                 </div>
                     {error && <p className="text-red-500 text-md text-center">{error}</p> }
                 <p className="text-gray-500 text-md">Already have account? <a href="/signin" className="text-gray-600 underline cursor-pointer">Login</a></p>

@@ -72,7 +72,7 @@ export  default function Signin(){
                 <Input reference={userIdentityRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
                 <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
                 <div className="mt-3 ">
-                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md bg-black text-white   ${isLoading && "animate-pulse"}`} onClick={handleSignup}>Login</button>
+                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md bg-black text-white   ${isLoading && "animate-pulse"} duration-1000`} onClick={handleSignup}>Login</button>
                 </div>
                     {error && <p className="text-red-500 text-sm text-center">{error}</p> }
                 <p className="text-gray-500 text-sm">Don't have account? <a href="/signup" className="text-gray-600 underline cursor-pointer">Signup</a></p>
