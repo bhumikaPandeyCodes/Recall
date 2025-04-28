@@ -14,8 +14,12 @@ export  default function Signup(){
     const userNameRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const [error, setError] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
+
     const navigate = useNavigate()
    async function handleSignup(){
+    setIsLoading(true)
+
     console.log(emailRef.current)
         try{
 
@@ -38,17 +42,20 @@ export  default function Signup(){
                         }
                     }
                     else{
+                        setIsLoading(false)
                         setError("error while signing up")
                     }
 
                 }
                 else{
+                    setIsLoading(false)
                     setError("please enter all the fields")
                 }
 
             }
         }
         catch(error){
+            setIsLoading(false)
             if(axios.isAxiosError(error))
             setError(error.response?.data?.error)
             else{
@@ -75,7 +82,7 @@ useEffect(()=>{
                 <Input reference={userNameRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
                 <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
                 <div className="mt-3 ">
-                    <button className="px-2 py-1 border-[1.6px] border-gray-500 rounded-md" onClick={handleSignup}>Create Account</button>
+                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md ${isLoading&&"animate-pulse"}`} onClick={handleSignup}>Create Account</button>
                 </div>
                     {error && <p className="text-red-500 text-md text-center">{error}</p> }
                 <p className="text-gray-500 text-md">Already have account? <a href="/signin" className="text-gray-600 underline cursor-pointer">Login</a></p>

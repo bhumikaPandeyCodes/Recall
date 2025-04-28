@@ -11,6 +11,7 @@ export  default function ImageUpload(){
     const [addImg, setAddImg] = useState(true)
     const imgRef = useRef<HTMLInputElement>(null)
     const [error,setError] = useState("")
+    const [isLoading,setIsLoading] = useState(false)
     const formData = new FormData
 
     const navigate = useNavigate()
@@ -34,6 +35,7 @@ export  default function ImageUpload(){
     }
     
     async function handleSubmit(e:React.MouseEvent<HTMLButtonElement>){
+        setIsLoading(true)
         e.preventDefault()
         setError("")
         if(addImg)
@@ -52,15 +54,19 @@ export  default function ImageUpload(){
                             )
                 if(response.status==200)
                      navigate("/dashboard")
-                else
+                else{
+                    setIsLoading(false)
                     setError("Couldn't upload image. Please try again")
+                }
                     
                 }
                 catch(error){
+                    setIsLoading(false)
                     console.log(error)
                 }   
             }
             else{
+                setIsLoading(false)
                 setError("Couldn't upload image. Please try again")
                 console.log("formdata not uplaoded")
             }
@@ -111,7 +117,7 @@ export  default function ImageUpload(){
                         </button>
                     </div>
                     {error && <p className="text-red-400">{error}</p>}
-                    <button className="px-2 py-1 w-full border-[1.6px] border-gray-500 rounded-md" onClick={(e)=>handleSubmit(e)}>Done</button>
+                    <button className={`px-2 py-1 w-full border-[1.6px] border-gray-500 rounded-md ${isLoading && "animate-pulse"} `} onClick={(e)=>handleSubmit(e)}>Done</button>
                 </form>
             </div>
         </div>

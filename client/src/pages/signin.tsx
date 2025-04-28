@@ -11,10 +11,11 @@ export  default function Signin(){
     const userIdentityRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const [error, setError] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
    async function handleSignup(){
         try{
-
+            setIsLoading(true)
             if(userIdentityRef.current && passwordRef.current){
                 
 
@@ -33,17 +34,20 @@ export  default function Signin(){
                         navigate("/dashboard")
                     }
                     else{
+                        setIsLoading(false)
                         setError("username/ email or password is incorrect")
                     }
 
                 }
                 else{
+                    setIsLoading(false)
                     setError("please enter all the fields")
                 }
                 
             }
         }
         catch(error){
+            setIsLoading(false)
             if(axios.isAxiosError(error))
              setError(error.response?.data?.error)
             else{
@@ -68,7 +72,7 @@ export  default function Signin(){
                 <Input reference={userIdentityRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
                 <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
                 <div className="mt-3 ">
-                    <button className="px-2 py-1 border-[1.6px] border-gray-500 rounded-md" onClick={handleSignup}>Login</button>
+                    <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md bg-black text-white   ${isLoading && "animate-pulse"}`} onClick={handleSignup}>Login</button>
                 </div>
                     {error && <p className="text-red-500 text-sm text-center">{error}</p> }
                 <p className="text-gray-500 text-sm">Don't have account? <a href="/signup" className="text-gray-600 underline cursor-pointer">Signup</a></p>

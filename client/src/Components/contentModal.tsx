@@ -26,6 +26,7 @@ export default function ContentModal({setAddContent}: contentModalProps){
     const [selectedTag, setSelectedTag] = useState<string[]>([])
     const [authorization, _] = useState<string | null>(localStorage.getItem("authorization"))
     const [error, setError] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
     async function getTags(){
         try{
@@ -57,6 +58,7 @@ export default function ContentModal({setAddContent}: contentModalProps){
     }
 
     async function handleSubmit(e:React.FormEvent<HTMLFormElement>){
+        setIsLoading(true)
         e.preventDefault()
         try{    
             const authorization = localStorage.getItem("authorization")
@@ -66,12 +68,15 @@ export default function ContentModal({setAddContent}: contentModalProps){
             console.log(response)
             if(response.data.success == true)
                 location.reload()
-            else
+            else{
+                setIsLoading(false)
                 setError("Couldn't upload. Try again")
+            }
             // console.log(newContent)
 
         }
         catch(error){
+            setIsLoading(false)
             console.log(error)
         }
 
@@ -87,7 +92,7 @@ export default function ContentModal({setAddContent}: contentModalProps){
 
 
     return (
-      <div className="w-[350px] h-[420px] border-[1.4px] border-gray-500 rounded-md p-2">
+      <div className={`w-[350px] h-[420px] border-[1.4px] border-gray-500 rounded-md p-2 ${isLoading && "animate-pulse"} bg-gray-50 duration-1000`}>
         <div className="flex justify-end">
             <button onClick={()=>setAddContent(false)}>
                 <CrossIcon size={6} color="black"/>
