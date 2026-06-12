@@ -12,6 +12,7 @@ export  default function Signin(){
     const passwordRef = useRef<HTMLInputElement>(null)
     const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const navigate = useNavigate()
    async function handleSignup(){
         try{
@@ -67,10 +68,25 @@ export  default function Signin(){
             initial={{opacity:0,}}
             animate={{opacity:1}}
             transition={{duration:0.4, delay:0.2, ease:easeIn}}
-            className=" w-64 h-[360px] py-4 flex flex-col  items-center gap-4 border-[1.6px] border-gray-500  rounded-md">
+            className=" px-3  w-64 h-[360px] py-4 flex flex-col  items-center gap-4 border-[1.6px] border-gray-500  rounded-md">
                 <p className="text-2xl font-medium font-headFont">Signin</p>
                 <Input reference={userIdentityRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
-                <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
+                <Input
+                    reference={passwordRef}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    onChange={()=>setError("")}
+                    suffix={
+                        <button
+                            type="button"
+                            onMouseDown={(e)=>e.preventDefault()}
+                            onClick={()=>setShowPassword(prev=>!prev)}
+                            className="text-xs text-gray-600 hover:text-black"
+                        >
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    }
+                />
                 <div className="mt-3 ">
                     <button className={`px-2 py-1 border-[1.6px] border-gray-500 rounded-md bg-black text-white   ${isLoading && "animate-pulse"} duration-1000`} onClick={handleSignup}>Login</button>
                 </div>

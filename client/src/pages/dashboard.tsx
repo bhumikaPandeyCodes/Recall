@@ -39,11 +39,8 @@ export default function Dashboard(){
   useEffect(()=>{
     if(share){
       shareContent()
-      // console.log("share content enabled")
-      // console.log(shareLink)
     }
-    // console.log(viewContent)
-    // console.log("share button is clicked ")
+
   },[share])
 
     return(

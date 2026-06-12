@@ -110,6 +110,7 @@ async function deleteContent(id: string){
             <span className="font-semibold text-lg md:text-xl text-center md:text-left sm:w-full">{username}'s Board</span>
             <div className="flex gap-2 self-end justify-around w-full md:justify-end">
                 <Button onClick={handleAddContent} variant="primary" text="Add content" startIcon={<AddIcon/>} />
+                <Button onClick={handleAddContent} variant="primary" text="Upload Document" startIcon={<AddIcon/>} />
                 <Button onClick={handleShareContent} variant="secondary" text="Share" startIcon={<ShareIcon/>} />
             </div>
         </div>

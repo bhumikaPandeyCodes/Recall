@@ -29,6 +29,13 @@ export default function Card({id, type, title, tags, link, createdAt,authorize ,
     let d = new Date(date)
     return d.toLocaleDateString()
   } 
+  function getYoutubeEmbedUrl(url: string) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    const videoId = (match && match[2].length === 11) ? match[2] : null;
+    
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+  }
   useEffect(()=>{
     if (window.twttr) {
       window.twttr.widgets.load();
@@ -56,26 +63,32 @@ export default function Card({id, type, title, tags, link, createdAt,authorize ,
             }
         </div>
         <div className="w-full  flex flex-col justify-between gap-4 object-fill ">
-        <div className="w-fit h-80">            
-            {type=="Youtube" && <iframe className="w-full mt-2 rounded-md" src={link.replace("watch?v=", "embed/")} title="YouTube video player"  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe> }
-            
-            { type =="Tweet" && 
-            <div className="h-80  overflow-auto">
-              <blockquote className="twitter-tweet " >           
-                <a className="" href={link.replace("x.com","twitter.com")}></a>
+          <div className="w-full min-h-[160px]">            
+              {type === "Youtube" && (
+                <iframe 
+                  className="w-full mt-2 rounded-md aspect-video" 
+                  src={getYoutubeEmbedUrl(link)} 
+                  title="YouTube video player" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  referrerPolicy="strict-origin-when-cross-origin" 
+                  allowFullScreen
+                ></iframe> 
+              )}
+              
+              {type === "Tweet" && (
+                <div className="max-h-80 overflow-auto">
+                  <blockquote className="twitter-tweet">           
+                    <a href={link.replace("x.com", "twitter.com")}></a>
+                  </blockquote> 
+                </div>
+              )}
 
-            </blockquote> 
-              </div>
-            }
-
-            {
-              type=="Link" &&
-              <span className="w-full mt-2 text-wrap flex flex-wrap break-all">
-                <a className="text-gray-700 underline text-center text-wrap break-all" href={link} target="_blank" rel="noopener">{link}</a>
-              </span>
-            }
-          
-        </div>
+              {type === "Link" && (
+                <span className="w-full mt-2 text-wrap flex flex-wrap break-all">
+                  <a className="text-blue-600 underline text-sm break-all" href={link} target="_blank" rel="noopener">{link}</a>
+                </span>
+              )}
+          </div>
         <div>
 
             <div className="gap-2 flex flex-wrap ">

@@ -15,6 +15,7 @@ export  default function Signup(){
     const passwordRef = useRef<HTMLInputElement>(null)
     const [error, setError] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     const navigate = useNavigate()
    async function handleSignup(){
@@ -76,11 +77,27 @@ useEffect(()=>{
             initial={{opacity:0,}}
             animate={{opacity:1}}
             transition={{duration:0.4, delay:0.2, ease:easeIn}}
-             className=" w-64 h-[360px] py-4 flex flex-col  items-center gap-2 border-[1.6px] border-gray-500  rounded-md">
+             className=" w-64 px-3 h-[360px] py-4 flex flex-col  items-center gap-2 border-[1.6px] border-gray-500  rounded-md">
                 <p className="text-2xl font-medium font-headFont">Signup</p>
                 <Input reference={emailRef} type="text" placeholder="Email" onChange={()=>setError("")}/>
                 <Input reference={userNameRef} type="text" placeholder="Username" onChange={()=>setError("")}/>
-                <Input reference={passwordRef} type="password" placeholder="Password" onChange={()=>setError("")}/>
+                <Input
+                    reference={passwordRef}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    onChange={()=>setError("")}
+                    suffix={
+                        <button
+                            type="button"
+                            onMouseDown={(e)=>e.preventDefault()}
+                            onClick={()=>setShowPassword(prev=>!prev)}
+                            className="text-xs text-gray-600 hover:text-black"
+                        >
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    }
+                />
+                
                 <div className="mt-3 ">
                     <button className={`px-2 py-1 border-[1.6px] border-gray-500 bg-black text-white rounded-md ${isLoading&&"animate-pulse"} duration-1000`} onClick={handleSignup}>Create Account</button>
                 </div>
